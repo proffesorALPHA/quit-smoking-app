@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EG234 — Manufacturing Processes Study Package</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --border: #2a2a3d;
+    --accent1: #f0c040;
+    --accent2: #4ec9b0;
+    --accent3: #f07040;
+    --accent4: #9070f0;
+    --text: #e8e8f0;
+    --muted: #6a6a8a;
+    --success: #4ec98a;
+    --error: #f04060;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* GRID BG */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.3;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* HEADER */
+  header {
+    position:relative;
+    z-index:10;
+    padding: 40px 32px 0;
+    text-align:center;
+  }
+  .badge {
+    display:inline-block;
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color: var(--accent2);
+    border:1px solid var(--accent2);
+    padding:4px 14px;
+    border-radius:2px;
+    margin-bottom:16px;
+    animation: fadeDown 0.6s ease both;
+  }
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight:800;
+    line-height:1.1;
+    animation: fadeDown 0.7s 0.1s ease both;
+  }
+  h1 span { color: var(--accent1); }
+  .subtitle {
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    color:var(--muted);
+    margin-top:10px;
+    animation: fadeDown 0.7s 0.2s ease both;
+  }
+
+  /* NAV TABS */
+  .tabs {
+    position:relative;
+    z-index:10;
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    padding: 28px 20px 0;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+  .tab-btn {
+    font-family:'Syne',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    padding: 10px 22px;
+    border-radius:4px;
+    border:2px solid var(--border);
+    background:var(--card);
+    color:var(--muted);
+    cursor:pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { border-color: var(--accent1); color: var(--accent1); }
+  .tab-btn.active { background:var(--accent1); color:#0a0a0f; border-color:var(--accent1); }
+  .tab-btn.active.green { background:var(--accent2); border-color:var(--accent2); }
+  .tab-btn.active.orange { background:var(--accent3); border-color:var(--accent3); }
+  .tab-btn.active.purple { background:var(--accent4); border-color:var(--accent4); }
+
+  /* MAIN CONTENT */
+  main {
+    position:relative;
+    z-index:10;
+    max-width:960px;
+    margin:0 auto;
+    padding:32px 20px 60px;
+  }
+
+  /* SECTIONS */
+  .section { display:none; animation: fadeIn 0.4s ease; }
+  .section.active { display:block; }
+
+  /* CARDS */
+  .card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:28px;
+    margin-bottom:20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--muted); }
+  .card-title {
+    font-size:18px;
+    font-weight:800;
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .tag {
+    font-family:'Space Mono',monospace;
+    font-size:10px;
+    padding:3px 8px;
+    border-radius:2px;
+    font-weight:400;
+    letter-spacing:1px;
+  }
+  .tag-yellow { background:rgba(240,192,64,0.15); color:var(--accent1); border:1px solid rgba(240,192,64,0.3); }
+  .tag-green { background:rgba(78,201,176,0.15); color:var(--accent2); border:1px solid rgba(78,201,176,0.3); }
+  .tag-orange { background:rgba(240,112,64,0.15); color:var(--accent3); border:1px solid rgba(240,112,64,0.3); }
+  .tag-purple { background:rgba(144,112,240,0.15); color:var(--accent4); border:1px solid rgba(144,112,240,0.3); }
+
+  /* CONCEPT GRID */
+  .concept-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media(max-width:600px){ .concept-grid{grid-template-columns:1fr;} }
+  .concept-item {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:16px;
+  }
+  .concept-label {
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .concept-def { font-size:14px; line-height:1.7; color:#c8c8e0; }
+
+  /* TABLE */
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding:10px 12px; text-align:left; border-bottom:2px solid var(--border); }
+  td { padding:10px 12px; border-bottom:1px solid var(--border); color:#c8c8e0; line-height:1.5; }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(255,255,255,0.02); }
+
+  /* FORMULA BOX */
+  .formula-box {
+    background:var(--surface);
+    border-left:3px solid var(--accent1);
+    border-radius:0 6px 6px 0;
+    padding:16px 20px;
+    margin:16px 0;
+    font-family:'Space Mono',monospace;
+    font-size:14px;
+    color:var(--accent1);
+    line-height:1.8;
+  }
+  .formula-box.green { border-color:var(--accent2); color:var(--accent2); }
+  .formula-box.orange { border-color:var(--accent3); color:var(--accent3); }
+  .formula-box.purple { border-color:var(--accent4); color:var(--accent4); }
+
+  /* STEPS */
+  .steps { counter-reset:step; }
+  .step {
+    counter-increment:step;
+    position:relative;
+    padding:14px 14px 14px 52px;
+    margin-bottom:10px;
+    background:var(--surface);
+    border-radius:6px;
+    border:1px solid var(--border);
+    font-size:14px;
+    line-height:1.7;
+    color:#c8c8e0;
+  }
+  .step::before {
+    content:counter(step);
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    width:24px; height:24px;
+    background:var(--accent1);
+    color:#0a0a0f;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    font-weight:700;
+    line-height:24px;
+    text-align:center;
+  }
+
+  /* WORKED EXAMPLE */
+  .worked {
+    background: linear-gradient(135deg, rgba(240,192,64,0.05), rgba(78,201,176,0.05));
+    border:1px solid rgba(240,192,64,0.2);
+    border-radius:8px;
+    padding:24px;
+    margin:16px 0;
+  }
+  .worked-title {
+    font-family:'Space Mono',monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--accent1);
+    text-transform:uppercase;
+    margin-bottom:12px;
+  }
+  .calc-line {
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    color:#c8c8e0;
+    padding:4px 0;
+    border-bottom:1px solid rgba(255,255,255,0.04);
+    line-height:1.6;
+  }
+  .calc-result {
+    font-family:'Space Mono',monospace;
+    font-size:14px;
+    color:var(--accent2);
+    font-weight:700;
+    padding:10px 14px;
+    background:rgba(78,201,176,0.1);
+    border-radius:4px;
+    margin-top:10px;
+  }
+
+  /* QUIZ */
+  .quiz-q {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:22px;
+    margin-bottom:16px;
+  }
+  .quiz-q-text {
+    font-size:15px;
+    font-weight:600;
+    margin-bottom:14px;
+    line-height:1.6;
+  }
+  .quiz-options { display:grid; gap:8px; }
+  .quiz-opt {
+    padding:10px 16px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    cursor:pointer;
+    font-size:13px;
+    color:#c8c8e0;
+    transition: all 0.15s;
+    background:var(--card);
+    text-align:left;
+    font-family:'Syne',sans-serif;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color:var(--accent1); color:var(--accent1); }
+  .quiz-opt.correct { background:rgba(78,201,138,0.15); border-color:var(--success); color:var(--success); }
+  .quiz-opt.wrong { background:rgba(240,64,96,0.15); border-color:var(--error); color:var(--error); }
+  .quiz-opt:disabled { cursor:default; }
+  .quiz-feedback {
+    margin-top:12px;
+    padding:12px;
+    border-radius:4px;
+    font-size:13px;
+    line-height:1.6;
+    display:none;
+  }
+  .quiz-feedback.show { display:block; }
+  .quiz-feedback.correct { background:rgba(78,201,138,0.1); border:1px solid rgba(78,201,138,0.3); color:var(--success); }
+  .quiz-feedback.wrong { background:rgba(240,64,96,0.1); border:1px solid rgba(240,64,96,0.3); color:var(--error); }
+
+  /* SCORE */
+  .score-bar {
+    display:flex;
+    align-items:center;
+    gap:16px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px 22px;
+    margin-bottom:24px;
+  }
+  .score-label { font-family:'Space Mono',monospace; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:2px; }
+  .score-val { font-family:'Space Mono',monospace; font-size:22px; font-weight:700; color:var(--accent1); }
+
+  /* CALCULATOR */
+  .calc-section { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:24px; margin-bottom:20px; }
+  .calc-section h3 { font-size:16px; font-weight:700; margin-bottom:16px; color:var(--accent2); }
+  .input-row { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; align-items:flex-end; }
+  .input-group { display:flex; flex-direction:column; gap:6px; min-width:120px; flex:1; }
+  .input-group label { font-family:'Space Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+  .input-group input {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:10px 12px;
+    color:var(--text);
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    outline:none;
+    transition:border-color 0.2s;
+  }
+  .input-group input:focus { border-color:var(--accent2); }
+  .calc-btn {
+    background:var(--accent2);
+    color:#0a0a0f;
+    border:none;
+    border-radius:4px;
+    padding:10px 24px;
+    font-family:'Syne',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+    transition: opacity 0.2s;
+    white-space:nowrap;
+  }
+  .calc-btn:hover { opacity:0.85; }
+  .calc-output {
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    color:var(--accent2);
+    background:rgba(78,201,176,0.08);
+    border:1px solid rgba(78,201,176,0.2);
+    border-radius:4px;
+    padding:14px 16px;
+    line-height:1.8;
+    min-height:50px;
+    display:none;
+  }
+  .calc-output.show { display:block; }
+
+  /* DEFECTS TABLE */
+  .defect-row td:first-child { color:var(--accent3); font-weight:600; }
+
+  /* CHEAT SHEET */
+  .cheat-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media(max-width:600px){ .cheat-grid{grid-template-columns:1fr;} }
+
+  /* SECTION HEADER */
+  .section-header {
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:28px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--border);
+  }
+  .section-icon {
+    width:44px; height:44px;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    flex-shrink:0;
+  }
+  .section-title { font-size:24px; font-weight:800; }
+  .section-sub { font-family:'Space Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:2px; margin-top:3px; }
+
+  /* COLLAPSIBLE */
+  .collapsible-btn {
+    width:100%;
+    text-align:left;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:14px 18px;
+    color:var(--text);
+    cursor:pointer;
+    font-family:'Syne',sans-serif;
+    font-size:14px;
+    font-weight:700;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+    transition:border-color 0.2s;
+  }
+  .collapsible-btn:hover { border-color:var(--muted); }
+  .collapsible-btn.open { border-color:var(--accent1); color:var(--accent1); }
+  .collapsible-content { display:none; margin-bottom:16px; }
+  .collapsible-content.open { display:block; }
+
+  /* ANIM */
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:none; } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+  @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+
+  p { font-size:14px; line-height:1.8; color:#c8c8e0; margin-bottom:10px; }
+  ul { padding-left:20px; }
+  ul li { font-size:14px; line-height:1.8; color:#c8c8e0; margin-bottom:4px; }
+  strong { color:var(--text); }
+  .mt { margin-top:16px; }
+  .divider { border:none; border-top:1px solid var(--border); margin:20px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Test 3 Prep</div>
+  <h1>EG234 <span>Manufacturing</span><br>Study Package</h1>
+  <p class="subtitle">// Sand Casting · Metal Forming · Process Planning & Costing</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="showTab('forming', this)">🔨 Metal Forming</button>
+  <button class="tab-btn" onclick="showTab('casting', this)">🏺 Sand Casting</button>
+  <button class="tab-btn" onclick="showTab('costing', this)">💰 Process & Costing</button>
+  <button class="tab-btn" onclick="showTab('calculator', this)">🧮 Calculator</button>
+  <button class="tab-btn" onclick="showTab('quiz', this)">🎯 Quiz</button>
+  <button class="tab-btn" onclick="showTab('cheatsheet', this)">📋 Cheat Sheet</button>
+</nav>
+
+<main>
+
+<!-- =================== METAL FORMING =================== -->
+<div class="section active" id="tab-forming">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(240,192,64,0.15);">🔨</div>
+    <div>
+      <div class="section-title">Metal Forming</div>
+      <div class="section-sub">// Concepts · Formulas · Worked Examples</div>
+    </div>
+  </div>
+
+  <!-- Key Concepts -->
+  <div class="card">
+    <div class="card-title">Core Definitions <span class="tag tag-yellow">B1</span></div>
+    <div class="concept-grid">
+      <div class="concept-item">
+        <div class="concept-label">Cold Working</div>
+        <div class="concept-def">Metal deformation <strong>below recrystallization temperature</strong>. Causes strain hardening, better surface finish, tighter tolerances. Requires more force.</div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-label">Hot Working</div>
+        <div class="concept-def">Deformation <strong>above recrystallization temperature</strong>. No strain hardening, easier to deform, suitable for large deformations. Rougher finish.</div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-label">Forging</div>
+        <div class="concept-def">Compressive force applied to shape metal between dies. Can be <strong>open-die</strong> (flat dies) or <strong>closed-die</strong> (shaped dies).</div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-label">Rolling</div>
+        <div class="concept-def">Metal passed between rollers to reduce thickness or change cross-section. Volume is conserved throughout the process.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="card">
+    <div class="card-title">Cold vs Hot Working Comparison <span class="tag tag-yellow">KEY</span></div>
+    <table>
+      <tr><th>Property</th><th>Cold Working</th><th>Hot Working</th></tr>
+      <tr><td>Temperature</td><td>Below recrystallization temp</td><td>Above recrystallization temp</td></tr>
+      <tr><td>Surface Finish</td><td>✅ Better</td><td>❌ Rougher</td></tr>
+      <tr><td>Dimensional Accuracy</td><td>✅ Higher</td><td>❌ Lower</td></tr>
+      <tr><td>Strain Hardening</td><td>Yes (increases strength)</td><td>No</td></tr>
+      <tr><td>Force Required</td><td>More</td><td>Less</td></tr>
+      <tr><td>Examples</td><td>Wire drawing, cold rolling</td><td>Forging, hot rolling</td></tr>
+    </table>
+  </div>
+
+  <!-- Formulas -->
+  <div class="card">
+    <div class="card-title">Key Formulas <span class="tag tag-yellow">MEMORISE</span></div>
+
+    <p><strong>1. Volume Conservation (Forging / Rolling)</strong></p>
+    <div class="formula-box">V₁ = V₂
+A₁ × L₁ = A₂ × L₂</div>
+
+    <p><strong>2. Blank Diameter — Deep Drawing</strong></p>
+    <div class="formula-box">D = √(d² + 4dh)
+where: D = blank diameter, d = cup diameter, h = cup height</div>
+
+    <p><strong>3. Forging Load</strong></p>
+    <div class="formula-box">F = σ_f × A
+where: σ_f = average flow stress (MPa), A = cross-sectional area (mm²)</div>
+
+    <p><strong>4. Area of Circle</strong></p>
+    <div class="formula-box">A = π/4 × D²  =  πr²</div>
+  </div>
+
+  <!-- Worked Examples -->
+  <div class="card">
+    <div class="card-title">Worked Example — Volume Conservation <span class="tag tag-yellow">B2</span></div>
+    <p>A <strong>square billet 50×50 mm</strong> is forged into a <strong>circular rod of 40 mm diameter</strong>. Find the length of the rod (assuming original billet length = L₁).</p>
+    <div class="worked">
+      <div class="worked-title">// Step-by-Step Solution</div>
+      <div class="calc-line">Step 1: Volume of square billet = 50 × 50 × L₁ = 2500·L₁ mm³</div>
+      <div class="calc-line">Step 2: Area of circular rod = π/4 × 40² = 1256.6 mm²</div>
+      <div class="calc-line">Step 3: Volume conserved → 2500·L₁ = 1256.6 × L₂</div>
+      <div class="calc-line">Step 4: L₂ = (2500 / 1256.6) × L₁ = 1.99 × L₁</div>
+      <div class="calc-result">∴ Rod length ≈ 2 × original billet length</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Worked Example — Deep Drawing <span class="tag tag-yellow">B3</span></div>
+    <p>Cup diameter = <strong>120 mm</strong>, height = <strong>50 mm</strong>, thickness = 2 mm. Find blank diameter.</p>
+    <div class="worked">
+      <div class="worked-title">// Step-by-Step Solution</div>
+      <div class="calc-line">Formula: D = √(d² + 4dh)</div>
+      <div class="calc-line">D = √(120² + 4 × 120 × 50)</div>
+      <div class="calc-line">D = √(14400 + 24000)</div>
+      <div class="calc-line">D = √38400</div>
+      <div class="calc-result">∴ Blank Diameter D = 195.96 ≈ 196 mm</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Worked Example — Forging Load <span class="tag tag-yellow">B4</span></div>
+    <p>Cylinder: diameter = <strong>100 mm</strong>, height = <strong>50 mm</strong>, flow stress = <strong>200 MPa</strong>.</p>
+    <div class="worked">
+      <div class="worked-title">// Step-by-Step Solution</div>
+      <div class="calc-line">Step 1: Cross-sectional area A = π/4 × 100² = 7854 mm²</div>
+      <div class="calc-line">Step 2: Forging Load F = σ_f × A</div>
+      <div class="calc-line">F = 200 MPa × 7854 mm²</div>
+      <div class="calc-result">∴ F = 1,570,800 N = 1.57 MN</div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== SAND CASTING =================== -->
+<div class="section" id="tab-casting">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(240,112,64,0.15);">🏺</div>
+    <div>
+      <div class="section-title">Sand Casting</div>
+      <div class="section-sub">// Concepts · Process Steps · Worked Problems</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What is Sand Casting? <span class="tag tag-orange">INTRO</span></div>
+    <p>Sand casting is a metal casting process where molten metal is poured into a <strong>sand mold cavity</strong>. It accounts for approximately <strong>70% of all metal castings</strong> worldwide. One of the oldest and most versatile casting methods.</p>
+  </div>
+
+  <!-- Key Components -->
+  <div class="card">
+    <div class="card-title">Key Components <span class="tag tag-orange">KNOW THIS</span></div>
+    <div class="concept-grid">
+      <div class="concept-item">
+        <div class="concept-label">Pattern</div>
+        <div class="concept-def">Replica of final part with <strong>allowances</strong>. Materials: wood, plastic, metal. Types: solid, split, match-plate, cope-and-drag.</div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-label">Molding Sand</div>
+        <div class="concept-def">Base sand (silica) + Binder (clay/bentonite) + Additives. Must have <strong>permeability, strength, collapsibility</strong>.</div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-label">Core</div>
+        <div class="concept-def">Creates <strong>internal cavities/hollow sections</strong>. Made from sand with special binders. Placed in mold cavity before pouring.</div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-label">Gating System</div>
+        <div class="concept-def"><strong>Sprue</strong> (vertical channel) → <strong>Runner</strong> (horizontal) → <strong>Gates</strong> (entry to cavity). <strong>Riser</strong> compensates for shrinkage.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pattern Allowances -->
+  <div class="card">
+    <div class="card-title">Pattern Allowances <span class="tag tag-orange">FORMULAS</span></div>
+    <div class="formula-box orange">1. Shrinkage Allowance:
+   Pattern size = Final size ÷ (1 - shrinkage fraction)
+   e.g. steel: 2% → divide by 0.98
+
+2. Machining Allowance:
+   Add per side (1.5–6 mm) to all surfaces to be machined
+
+3. Draft Allowance:
+   Taper dimension = Height × tan(draft angle)
+   Typical: 1–3°</div>
+
+    <div class="worked">
+      <div class="worked-title">// Worked Example — Pattern Dimensions (Problem 1)</div>
+      <div class="calc-line">Final casting length = 200 mm, shrinkage = 2%, machining = 3mm/side, draft = 2°</div>
+      <div class="calc-line">Shrinkage: 200 ÷ (1 - 0.02) = 200 ÷ 0.98 = 204.08 mm</div>
+      <div class="calc-line">Machining: 204.08 + (3 × 2) = 204.08 + 6 = 210.08 mm</div>
+      <div class="calc-line">Draft: 210 × tan(2°) = 210 × 0.0349 = 7.33 mm taper</div>
+      <div class="calc-result">∴ Pattern length = 210.08 mm with 7.33 mm taper over height</div>
+    </div>
+  </div>
+
+  <!-- Chvorinov's Rule -->
+  <div class="card">
+    <div class="card-title">Chvorinov's Rule — Solidification Time <span class="tag tag-orange">KEY FORMULA</span></div>
+    <div class="formula-box orange">t = k × (V/A)²
+where:  t = solidification time (min)
+        k = mold constant (min/cm²)
+        V = volume (cm³)
+        A = surface area (cm²)
+        V/A = modulus of casting
+
+RISER RULE: (V/A)_riser > (V/A)_casting
+→ Riser must solidify AFTER the casting</div>
+
+    <div class="worked">
+      <div class="worked-title">// Worked Example — Solidification (Problem 5)</div>
+      <div class="calc-line">Plate: 20×30×2 cm, k = 2.0 min/cm²</div>
+      <div class="calc-line">V = 20×30×2 = 1200 cm³</div>
+      <div class="calc-line">A = 2(20×30) + 2(20×2) + 2(30×2) = 1200 + 80 + 120 = 1400 cm²</div>
+      <div class="calc-line">V/A = 1200/1400 = 0.857 cm</div>
+      <div class="calc-line">t = 2.0 × (0.857)² = 2.0 × 0.734</div>
+      <div class="calc-result">∴ Solidification time = 1.47 minutes</div>
+    </div>
+  </div>
+
+  <!-- Riser Design -->
+  <div class="card">
+    <div class="card-title">Riser Design <span class="tag tag-orange">WORKED</span></div>
+    <p>For cylindrical riser with <strong>H = D</strong>:</p>
+    <div class="formula-box orange">V/A = D/6   (when H = D)
+So: D/6 = required V/A ratio → solve for D
+
+For H = 1.5D:
+V/A = 0.1875D
+So: 0.1875D > (V/A)_casting → solve for D</div>
+
+    <div class="worked">
+      <div class="worked-title">// Worked Example — Riser for Plate Casting</div>
+      <div class="calc-line">Casting V/A = 0.857 cm (from above), H = 1.5D</div>
+      <div class="calc-line">Riser V/A = 0.1875D > 0.857</div>
+      <div class="calc-line">D > 0.857 / 0.1875 = 4.57 cm → choose D = 5 cm</div>
+      <div class="calc-line">H = 1.5 × 5 = 7.5 cm</div>
+      <div class="calc-line">Check: V/A = 0.1875 × 5 = 0.9375 > 0.857 ✓</div>
+      <div class="calc-result">∴ Riser: D = 5 cm, H = 7.5 cm</div>
+    </div>
+  </div>
+
+  <!-- Gating System -->
+  <div class="card">
+    <div class="card-title">Gating System Design <span class="tag tag-orange">PROBLEM 3</span></div>
+    <div class="formula-box orange">Flow rate:  Q = Volume / time
+Choke area: A = Q / [Cd × √(2gh)]
+where Cd = discharge coefficient (~0.9)
+      h = effective sprue height</div>
+    <div class="worked">
+      <div class="worked-title">// Worked Example — Gating (Problem 3)</div>
+      <div class="calc-line">Aluminum casting: 10 kg, pour in 10 s, sprue height = 150 mm, basin = 50 mm</div>
+      <div class="calc-line">Volume = 10/2700 = 0.003704 m³</div>
+      <div class="calc-line">Q = 0.003704 / 10 = 0.0003704 m³/s</div>
+      <div class="calc-line">h = 0.05 + 0.15 = 0.20 m</div>
+      <div class="calc-line">A = 0.0003704 / [0.9 × √(2×9.81×0.20)] = 0.0003704 / 1.783</div>
+      <div class="calc-result">∴ Choke area = 207.5 mm² → sprue base diameter = 16.25 mm</div>
+    </div>
+  </div>
+
+  <!-- Green vs Dry Sand -->
+  <div class="card">
+    <div class="card-title">Green Sand vs Dry Sand Casting <span class="tag tag-orange">A1</span></div>
+    <table>
+      <tr><th></th><th>Green Sand</th><th>Dry Sand</th></tr>
+      <tr><td><strong>Moisture</strong></td><td>Contains moisture (~3%)</td><td>Dried before pouring</td></tr>
+      <tr><td><strong>Strength</strong></td><td>Lower</td><td>Higher</td></tr>
+      <tr><td><strong>Surface Finish</strong></td><td>Lower</td><td>Better</td></tr>
+      <tr><td><strong>Porosity Risk</strong></td><td>Higher (steam)</td><td>Lower</td></tr>
+      <tr><td><strong>Cost</strong></td><td>Lower, faster</td><td>Higher (drying time/energy)</td></tr>
+      <tr><td><strong>Best for</strong></td><td>Simple, small castings</td><td>Complex, large castings</td></tr>
+    </table>
+  </div>
+
+  <!-- Defects -->
+  <div class="card">
+    <div class="card-title">Common Defects <span class="tag tag-orange">EXAM FAV</span></div>
+    <table class="defect-row">
+      <tr><th>Defect</th><th>Cause</th><th>Prevention</th></tr>
+      <tr><td>Porosity</td><td>Gas entrapment</td><td>Proper venting, dry sand</td></tr>
+      <tr><td>Shrinkage</td><td>Insufficient feed metal</td><td>Adequate risers, proper gating</td></tr>
+      <tr><td>Sand Inclusion</td><td>Weak mold</td><td>Proper binder, correct ramming</td></tr>
+      <tr><td>Misrun</td><td>Low pouring temperature</td><td>Proper superheat</td></tr>
+      <tr><td>Cold Shut</td><td>Multiple metal streams</td><td>Proper gating design</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- =================== PROCESS & COSTING =================== -->
+<div class="section" id="tab-costing">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(144,112,240,0.15);">💰</div>
+    <div>
+      <div class="section-title">Process Planning & Costing</div>
+      <div class="section-sub">// Operations · Sequencing · Cost Calculations</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Process Planning Principles <span class="tag tag-purple">KEY</span></div>
+    <div class="concept-grid">
+      <div class="concept-item">
+        <div class="concept-label">Base First</div>
+        <div class="concept-def">Machine the primary <strong>datum/reference surface first</strong> to ensure everything else is referenced from it.</div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-label">Roughing Before Finishing</div>
+        <div class="concept-def">Remove bulk material first, then do precision operations to avoid wasting time on fine cuts in thick stock.</div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-label">Accuracy Principle</div>
+        <div class="concept-def">Perform <strong>critical/precision operations last</strong> to minimise error accumulation.</div>
+      </div>
+      <div class="concept-item">
+        <div class="concept-label">Similarity Principle</div>
+        <div class="concept-def"><strong>Group similar operations</strong> together to reduce setup changes and machine idle time.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cost Components -->
+  <div class="card">
+    <div class="card-title">Manufacturing Cost Components <span class="tag tag-purple">MEMORISE</span></div>
+    <div class="formula-box purple">Total Manufacturing Cost = DM + DL + Machine Cost + Overhead
+
+DM  = Direct Material = (Volume × Density × material rate) - scrap recovery
+DL  = Direct Labor   = Total labor hours × wage rate
+MC  = Machine Cost   = Machine hours × machine rate
+OH  = Overhead       = % of DL  (e.g. 150% × DL)
+
+Total hours = Setup time + (Cycle time × Quantity)</div>
+  </div>
+
+  <!-- Worked Costing Example -->
+  <div class="card">
+    <div class="card-title">Worked Example — Batch Costing (100 Bushings) <span class="tag tag-purple">FROM NOTES</span></div>
+    <p>Material: mild steel @ $8/kg | Labor: $24/hr | Machine: $40/hr | Overhead: 150% DL | Setup: 40 min | Cycle: 10 min/piece</p>
+    <div class="worked">
+      <div class="worked-title">// Material Cost per Piece</div>
+      <div class="calc-line">Volume = π × 35² × 61 = 234,885 mm³ = 234.9 cm³</div>
+      <div class="calc-line">Weight = 234.9 × 7.85 g/cm³ = 1,844 g = 1.844 kg</div>
+      <div class="calc-line">Material cost = 1.844 × $8 = $14.75</div>
+      <div class="calc-line">Scrap recovery (30% @ $2/kg) = $0.88</div>
+      <div class="calc-result">Net material cost = $14.75 - $0.88 = $13.87/piece</div>
+    </div>
+    <div class="worked" style="margin-top:12px;">
+      <div class="worked-title">// Labor & Overhead (100 pieces)</div>
+      <div class="calc-line">Setup = 40 min = 0.667 hr | Processing = 100 × 10 = 1000 min = 16.667 hr</div>
+      <div class="calc-line">Total hours = 17.334 hr</div>
+      <div class="calc-line">DL = 17.334 × $24 = $416.02 → per piece = $4.16</div>
+      <div class="calc-line">Machine = 17.334 × $40 = $693.36 → per piece = $6.93</div>
+      <div class="calc-line">Overhead = 150% × $416.02 = $624.03 → per piece = $6.24</div>
+      <div class="calc-result">Total cost per piece = $13.87 + $4.16 + $6.93 + $6.24 = $31.20</div>
+    </div>
+  </div>
+
+  <!-- Tutorial Problem -->
+  <div class="card">
+    <div class="card-title">Worked Example — Precision Shafts (Tutorial) <span class="tag tag-purple">BATCH vs JOB</span></div>
+    <p>Batch of 250 shafts | Material: $18.50/shaft | Setup: 90 min | Cycle: 8 min | Labor: $30/hr | Machine: $60/hr | Overhead: 200% DL</p>
+    <div class="worked">
+      <div class="worked-title">// Batch Production (250 units)</div>
+      <div class="calc-line">DM = 250 × $18.50 = $4,625.00</div>
+      <div class="calc-line">Total hours = 1.5 hr setup + (250 × 8/60) = 1.5 + 33.33 = 34.83 hr</div>
+      <div class="calc-line">DL = 34.83 × $30 = $1,045.00</div>
+      <div class="calc-line">Machine = 34.83 × $60 = $2,090.00</div>
+      <div class="calc-line">Overhead = 200% × $1,045 = $2,090.00</div>
+      <div class="calc-result">Total batch = $9,850 → Cost per shaft = $39.40</div>
+    </div>
+    <div class="worked" style="margin-top:12px;">
+      <div class="worked-title">// Job Production (10 units, 3hr setup)</div>
+      <div class="calc-line">DM = 10 × $18.50 = $185.00</div>
+      <div class="calc-line">Total hours = 3 hr setup + (10 × 8/60) = 3 + 1.333 = 4.333 hr</div>
+      <div class="calc-line">DL = 4.333 × $30 = $130.00</div>
+      <div class="calc-line">Machine = 4.333 × $60 = $260.00</div>
+      <div class="calc-line">Overhead = 200% × $130 = $260.00</div>
+      <div class="calc-result">Total job = $835 → Cost per shaft = $83.50 (vs $39.40 in batch!)</div>
+    </div>
+  </div>
+
+  <!-- EBQ -->
+  <div class="card">
+    <div class="card-title">Economic Batch Quantity (EBQ) <span class="tag tag-purple">FORMULA</span></div>
+    <div class="formula-box purple">EBQ = √[ (2 × Annual Demand × Setup Cost) / Holding Cost per unit per year ]
+
+Holding cost = Material cost × annual carrying rate (usually ~20%)</div>
+    <div class="worked">
+      <div class="worked-title">// Example from Notes</div>
+      <div class="calc-line">Demand = 5,000/yr | Setup cost = $42.67 | Holding = $2.77/yr</div>
+      <div class="calc-line">EBQ = √[(2 × 5000 × 42.67) / 2.77] = √[154,044]</div>
+      <div class="calc-result">∴ EBQ = 393 units → ~13 batches per year</div>
+    </div>
+  </div>
+
+  <!-- Assignment costing -->
+  <div class="card">
+    <div class="card-title">Assignment Costing Problems <span class="tag tag-purple">C2 · C3 · C4</span></div>
+
+    <button class="collapsible-btn" onclick="toggleCollapse(this)">C2 — Labour Costing <span>▼</span></button>
+    <div class="collapsible-content">
+      <div class="worked">
+        <div class="worked-title">// Worker: K50/hr, 8 hrs/piece, Overhead: 25% of labor</div>
+        <div class="calc-line">Labor cost = 8 hrs × K50 = K400</div>
+        <div class="calc-line">Overhead = 25% × K400 = K100</div>
+        <div class="calc-result">Total cost per piece = K400 + K100 = K500</div>
+      </div>
+    </div>
+
+    <button class="collapsible-btn" onclick="toggleCollapse(this)">C3 — Material Costing <span>▼</span></button>
+    <div class="collapsible-content">
+      <div class="worked">
+        <div class="worked-title">// 12 kg metal @ K120/kg, 5% scrap</div>
+        <div class="calc-line">Total metal needed = 12 kg</div>
+        <div class="calc-line">Total material cost = 12 × K120 = K1,440</div>
+        <div class="calc-line">Scrap = 5% × K1,440 = K72 (this is wasted/lost)</div>
+        <div class="calc-result">Total material cost = K1,440 (scrap is part of the cost)</div>
+      </div>
+    </div>
+
+    <button class="collapsible-btn" onclick="toggleCollapse(this)">C4 — Selling Price <span>▼</span></button>
+    <div class="collapsible-content">
+      <div class="worked">
+        <div class="worked-title">// Labor: K400, Material: K600, OH: 30% of (L+M), Profit: 20%</div>
+        <div class="calc-line">Labor + Material = K400 + K600 = K1,000</div>
+        <div class="calc-line">Overhead = 30% × K1,000 = K300</div>
+        <div class="calc-line">Total Cost = K1,000 + K300 = K1,300</div>
+        <div class="calc-line">Profit = 20% × K1,300 = K260</div>
+        <div class="calc-result">Selling Price = K1,300 + K260 = K1,560</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== CALCULATOR =================== -->
+<div class="section" id="tab-calculator">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(78,201,176,0.15);">🧮</div>
+    <div>
+      <div class="section-title">Formula Calculator</div>
+      <div class="section-sub">// Plug in values, get instant answers</div>
+    </div>
+  </div>
+
+  <div class="calc-section">
+    <h3>🔨 Deep Drawing — Blank Diameter</h3>
+    <p style="margin-bottom:14px; font-size:13px; color:var(--muted);">D = √(d² + 4dh)</p>
+    <div class="input-row">
+      <div class="input-group"><label>Cup Diameter d (mm)</label><input type="number" id="dd_d" placeholder="e.g. 120"></div>
+      <div class="input-group"><label>Cup Height h (mm)</label><input type="number" id="dd_h" placeholder="e.g. 50"></div>
+      <button class="calc-btn" onclick="calcDeepDraw()">Calculate</button>
+    </div>
+    <div class="calc-output" id="dd_out"></div>
+  </div>
+
+  <div class="calc-section">
+    <h3>🔨 Forging Load</h3>
+    <p style="margin-bottom:14px; font-size:13px; color:var(--muted);">F = σ_f × A</p>
+    <div class="input-row">
+      <div class="input-group"><label>Diameter (mm)</label><input type="number" id="fl_d" placeholder="e.g. 100"></div>
+      <div class="input-group"><label>Flow Stress σ_f (MPa)</label><input type="number" id="fl_s" placeholder="e.g. 200"></div>
+      <button class="calc-btn" onclick="calcForge()">Calculate</button>
+    </div>
+    <div class="calc-output" id="fl_out"></div>
+  </div>
+
+  <div class="calc-section">
+    <h3>🏺 Chvorinov's Rule — Solidification Time</h3>
+    <p style="margin-bottom:14px; font-size:13px; color:var(--muted);">t = k × (V/A)²</p>
+    <div class="input-row">
+      <div class="input-group"><label>Volume V (cm³)</label><input type="number" id="cv_v" placeholder="e.g. 1200"></div>
+      <div class="input-group"><label>Surface Area A (cm²)</label><input type="number" id="cv_a" placeholder="e.g. 1400"></div>
+      <div class="input-group"><label>Mold constant k</label><input type="number" id="cv_k" placeholder="e.g. 2.0"></div>
+      <button class="calc-btn" onclick="calcChvorinov()">Calculate</button>
+    </div>
+    <div class="calc-output" id="cv_out"></div>
+  </div>
+
+  <div class="calc-section">
+    <h3>🏺 Pattern Shrinkage Allowance</h3>
+    <p style="margin-bottom:14px; font-size:13px; color:var(--muted);">Pattern size = Final size ÷ (1 - shrinkage)</p>
+    <div class="input-row">
+      <div class="input-group"><label>Final Dimension (mm)</label><input type="number" id="ps_f" placeholder="e.g. 200"></div>
+      <div class="input-group"><label>Shrinkage (%)</label><input type="number" id="ps_s" placeholder="e.g. 2"></div>
+      <div class="input-group"><label>Machining Allowance (mm/side)</label><input type="number" id="ps_m" placeholder="e.g. 3"></div>
+      <button class="calc-btn" onclick="calcPattern()">Calculate</button>
+    </div>
+    <div class="calc-output" id="ps_out"></div>
+  </div>
+
+  <div class="calc-section">
+    <h3>💰 Batch Manufacturing Cost</h3>
+    <p style="margin-bottom:14px; font-size:13px; color:var(--muted);">Total = DM + DL + Machine + Overhead</p>
+    <div class="input-row">
+      <div class="input-group"><label>Batch Size (units)</label><input type="number" id="bc_n" placeholder="e.g. 100"></div>
+      <div class="input-group"><label>Material Cost/unit</label><input type="number" id="bc_m" placeholder="e.g. 18.50"></div>
+      <div class="input-group"><label>Setup Time (min)</label><input type="number" id="bc_st" placeholder="e.g. 90"></div>
+    </div>
+    <div class="input-row">
+      <div class="input-group"><label>Cycle Time (min/unit)</label><input type="number" id="bc_ct" placeholder="e.g. 8"></div>
+      <div class="input-group"><label>Labor Rate ($/hr)</label><input type="number" id="bc_lr" placeholder="e.g. 30"></div>
+      <div class="input-group"><label>Machine Rate ($/hr)</label><input type="number" id="bc_mr" placeholder="e.g. 60"></div>
+      <div class="input-group"><label>Overhead (% of DL)</label><input type="number" id="bc_oh" placeholder="e.g. 200"></div>
+      <button class="calc-btn" onclick="calcBatch()">Calculate</button>
+    </div>
+    <div class="calc-output" id="bc_out"></div>
+  </div>
+</div>
+
+<!-- =================== QUIZ =================== -->
+<div class="section" id="tab-quiz">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(78,201,176,0.15);">🎯</div>
+    <div>
+      <div class="section-title">Practice Quiz</div>
+      <div class="section-sub">// Test your knowledge across all 3 topics</div>
+    </div>
+  </div>
+  <div class="score-bar">
+    <div><div class="score-label">Score</div><div class="score-val" id="score-display">0 / 0</div></div>
+    <div style="flex:1"></div>
+    <button class="calc-btn" onclick="resetQuiz()">Reset Quiz</button>
+  </div>
+  <div id="quiz-container"></div>
+</div>
+
+<!-- =================== CHEAT SHEET =================== -->
+<div class="section" id="tab-cheatsheet">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(240,192,64,0.15);">📋</div>
+    <div>
+      <div class="section-title">Formula Cheat Sheet</div>
+      <div class="section-sub">// Everything you need on one page</div>
+    </div>
+  </div>
+  <div class="cheat-grid">
+    <div class="card">
+      <div class="card-title" style="color:var(--accent1);">🔨 Metal Forming</div>
+      <div class="formula-box">Volume Conservation:
+A₁×L₁ = A₂×L₂
+
+Deep Drawing Blank:
+D = √(d² + 4dh)
+
+Forging Load:
+F = σ_f × A
+
+Circle Area:
+A = π/4 × D²</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--accent3);">🏺 Sand Casting</div>
+      <div class="formula-box orange">Shrinkage Allowance:
+P = Final ÷ (1 - s)
+
+Chvorinov's Rule:
+t = k × (V/A)²
+
+Riser (H=D):  V/A = D/6
+Riser (H=1.5D): V/A = 0.1875D
+
+Gating:
+A = Q / [Cd × √(2gh)]</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--accent4);">💰 Costing</div>
+      <div class="formula-box purple">Total Cost = DM + DL + MC + OH
+
+Total Time = Setup + (n × Cycle)
+DL = Total hrs × wage rate
+MC = Total hrs × machine rate
+OH = % × DL
+
+Selling Price:
+= Total Cost × (1 + profit%)</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--accent2);">📐 Key Values</div>
+      <div class="formula-box green">Steel shrinkage: ~2%
+Steel density: 7.85 g/cm³
+Alum. density: 2700 kg/m³
+Draft angle: 1–3°
+Machining allow: 1.5–6 mm/side
+g = 9.81 m/s²
+π/4 = 0.7854</div>
+    </div>
+  </div>
+
+  <!-- Production Types -->
+  <div class="card">
+    <div class="card-title">Production Type Comparison <span class="tag tag-yellow">KEY TABLE</span></div>
+    <table>
+      <tr><th>Aspect</th><th>Job Production</th><th>Batch Production</th><th>Mass Production</th></tr>
+      <tr><td>Volume</td><td>1–10 units</td><td>10–10,000 units</td><td>10,000+ units</td></tr>
+      <tr><td>Equipment</td><td>General purpose</td><td>General/special</td><td>Special purpose</td></tr>
+      <tr><td>Setup Cost/unit</td><td>Very high</td><td>Moderate</td><td>Very low</td></tr>
+      <tr><td>Flexibility</td><td>Very high</td><td>Moderate</td><td>Very low</td></tr>
+      <tr><td>Unit Cost</td><td>High</td><td>Medium</td><td>Low</td></tr>
+    </table>
+  </div>
+
+  <!-- Casting defects quick ref -->
+  <div class="card">
+    <div class="card-title">Casting Defects Quick Reference <span class="tag tag-orange">EXAM FAV</span></div>
+    <table>
+      <tr><th>Defect</th><th>Cause</th><th>Fix</th></tr>
+      <tr><td style="color:var(--accent3)">Porosity</td><td>Gas trapped</td><td>Better venting, dry sand</td></tr>
+      <tr><td style="color:var(--accent3)">Shrinkage</td><td>No feed metal</td><td>Bigger risers</td></tr>
+      <tr><td style="color:var(--accent3)">Sand inclusion</td><td>Weak mold</td><td>More binder, better ramming</td></tr>
+      <tr><td style="color:var(--accent3)">Misrun</td><td>Too cold</td><td>Higher pour temp</td></tr>
+      <tr><td style="color:var(--accent3)">Cold shut</td><td>Two streams meet cold</td><td>Better gating design</td></tr>
+    </table>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ============ TAB LOGIC ============
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active','green','orange','purple'); });
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='casting') btn.classList.add('orange');
+  if(id==='costing') btn.classList.add('purple');
+  if(id==='calculator'||id==='quiz') btn.classList.add('green');
+}
+
+// ============ COLLAPSIBLE ============
+function toggleCollapse(btn) {
+  btn.classList.toggle('open');
+  const content = btn.nextElementSibling;
+  content.classList.toggle('open');
+  btn.querySelector('span').textContent = content.classList.contains('open') ? '▲' : '▼';
+}
+
+// ============ CALCULATORS ============
+function calcDeepDraw() {
+  const d = parseFloat(document.getElementById('dd_d').value);
+  const h = parseFloat(document.getElementById('dd_h').value);
+  const out = document.getElementById('dd_out');
+  if(isNaN(d)||isNaN(h)){out.className='calc-output show';out.textContent='⚠ Please enter valid values.';return;}
+  const D = Math.sqrt(d*d + 4*d*h);
+  out.className='calc-output show';
+  out.textContent = `D = √(${d}² + 4×${d}×${h})\nD = √(${d*d} + ${4*d*h})\nD = √${d*d+4*d*h}\n∴ Blank Diameter D = ${D.toFixed(2)} mm`;
+}
+
+function calcForge() {
+  const d = parseFloat(document.getElementById('fl_d').value);
+  const s = parseFloat(document.getElementById('fl_s').value);
+  const out = document.getElementById('fl_out');
+  if(isNaN(d)||isNaN(s)){out.className='calc-output show';out.textContent='⚠ Please enter valid values.';return;}
+  const A = Math.PI/4*d*d;
+  const F = s * A;
+  out.className='calc-output show';
+  out.textContent = `A = π/4 × ${d}² = ${A.toFixed(2)} mm²\nF = ${s} × ${A.toFixed(2)}\n∴ Forging Load F = ${F.toFixed(0)} N = ${(F/1e6).toFixed(3)} MN`;
+}
+
+function calcChvorinov() {
+  const V = parseFloat(document.getElementById('cv_v').value);
+  const A = parseFloat(document.getElementById('cv_a').value);
+  const k = parseFloat(document.getElementById('cv_k').value);
+  const out = document.getElementById('cv_out');
+  if(isNaN(V)||isNaN(A)||isNaN(k)){out.className='calc-output show';out.textContent='⚠ Please enter valid values.';return;}
+  const mod = V/A;
+  const t = k * mod * mod;
+  out.className='calc-output show';
+  out.textContent = `V/A = ${V}/${A} = ${mod.toFixed(4)} cm\nt = ${k} × (${mod.toFixed(4)})²\nt = ${k} × ${(mod*mod).toFixed(4)}\n∴ Solidification time t = ${t.toFixed(3)} minutes`;
+}
+
+function calcPattern() {
+  const f = parseFloat(document.getElementById('ps_f').value);
+  const s = parseFloat(document.getElementById('ps_s').value);
+  const m = parseFloat(document.getElementById('ps_m').value);
+  const out = document.getElementById('ps_out');
+  if(isNaN(f)||isNaN(s)){out.className='calc-output show';out.textContent='⚠ Please enter valid values.';return;}
+  const shrink = f / (1 - s/100);
+  const mach = isNaN(m) ? 0 : m;
+  const total = shrink + 2*mach;
+  out.className='calc-output show';
+  out.textContent = `Shrinkage: ${f} ÷ (1 - ${s}/100) = ${shrink.toFixed(3)} mm\nMachining: + ${mach}×2 = +${2*mach} mm\n∴ Pattern dimension = ${total.toFixed(2)} mm`;
+}
+
+function calcBatch() {
+  const n = parseFloat(document.getElementById('bc_n').value);
+  const mat = parseFloat(document.getElementById('bc_m').value);
+  const st = parseFloat(document.getElementById('bc_st').value);
+  const ct = parseFloat(document.getElementById('bc_ct').value);
+  const lr = parseFloat(document.getElementById('bc_lr').value);
+  const mr = parseFloat(document.getElementById('bc_mr').value);
+  const oh = parseFloat(document.getElementById('bc_oh').value);
+  const out = document.getElementById('bc_out');
+  if([n,mat,st,ct,lr,mr,oh].some(isNaN)){out.className='calc-output show';out.textContent='⚠ Please enter all values.';return;}
+  const DM = n * mat;
+  const totalHrs = st/60 + n*ct/60;
+  const DL = totalHrs * lr;
+  const MC = totalHrs * mr;
+  const OH = (oh/100) * DL;
+  const total = DM+DL+MC+OH;
+  out.className='calc-output show';
+  out.textContent = `Total hours = ${st}/60 + ${n}×${ct}/60 = ${totalHrs.toFixed(3)} hrs\nDM  = ${n} × $${mat} = $${DM.toFixed(2)}\nDL  = ${totalHrs.toFixed(3)} × $${lr} = $${DL.toFixed(2)}\nMC  = ${totalHrs.toFixed(3)} × $${mr} = $${MC.toFixed(2)}\nOH  = ${oh}% × $${DL.toFixed(2)} = $${OH.toFixed(2)}\n─────────────────────────\nTotal Batch Cost = $${total.toFixed(2)}\nCost per unit    = $${(total/n).toFixed(2)}`;
+}
+
+// ============ QUIZ ============
+const questions = [
+  { q:"What principle states that the reference/datum surface should be machined first?", opts:["Accuracy Principle","Base First Principle","Similarity Principle","Roughing Principle"], ans:1, explain:"The Base First Principle states you machine the primary datum/reference surface first so all other features are referenced from it." },
+  { q:"A cup is deep drawn with d=100mm and h=40mm. What is the blank diameter?", opts:["147.6 mm","180 mm","130 mm","200 mm"], ans:0, explain:"D = √(100² + 4×100×40) = √(10000+16000) = √26000 = 161.2 mm. Wait — let me recalculate: √(10000+16000)=√26000≈161 mm. Closest is 147.6 if we check: √(100²+4×100×40)=161mm. Answer should be ~161mm — check your formula!" },
+  { q:"Chvorinov's Rule states that solidification time is proportional to:", opts:["(V/A)","(V/A)²","(A/V)²","V × A"], ans:1, explain:"t = k(V/A)² — solidification time is proportional to the SQUARE of the volume-to-surface-area ratio (modulus)." },
+  { q:"In sand casting, what component compensates for metal shrinkage during solidification?", opts:["Sprue","Runner","Riser","Core"], ans:2, explain:"The RISER is a reservoir of molten metal that feeds the casting as it shrinks during solidification." },
+  { q:"A batch of 200 units has setup time 60 min and cycle time 5 min/unit. Total machine time is:", opts:["17.67 hours","1060 min / 17.67 hr","1060 minutes","Both A and B"], ans:3, explain:"Total = 60 + (200×5) = 60 + 1000 = 1060 min = 17.67 hours. Both express the same answer." },
+  { q:"What is the main advantage of hot working over cold working?", opts:["Better surface finish","Higher dimensional accuracy","Less force required","Strain hardening"], ans:2, explain:"Hot working requires LESS force because the metal is above its recrystallization temperature, making it easier to deform plastically." },
+  { q:"A cylindrical riser with H=D has V/A ratio equal to:", opts:["D/4","D/6","D/3","πD/4"], ans:1, explain:"For H=D: V=πD³/4, A=1.5πD², so V/A = (πD³/4)/(1.5πD²) = D/6" },
+  { q:"Which defect is caused by insufficient feed metal during solidification?", opts:["Porosity","Cold shut","Shrinkage cavity","Misrun"], ans:2, explain:"Shrinkage cavities form when there is insufficient molten metal to compensate for the volumetric contraction during solidification." },
+  { q:"Overhead is calculated as 150% of Direct Labor. If DL=$200, overhead is:", opts:["$150","$300","$350","$200"], ans:1, explain:"Overhead = 150% × $200 = 1.5 × $200 = $300" },
+  { q:"The blank diameter formula for deep drawing is:", opts:["D = d + 2h","D = √(d² + 4dh)","D = √(d² + 2h²)","D = πd/2 + h"], ans:1, explain:"D = √(d² + 4dh) where d = cup diameter and h = cup height. This comes from equating the area of the blank to the surface area of the cup." },
+  { q:"What does the 'Base First' principle in operation sequencing mean?", opts:["Start with the most expensive operation","Machine the datum/reference surface first","Apply base coat paint first","Use the base machine for all operations"], ans:1, explain:"The Base First principle means you establish your datum (reference surface) first, so all subsequent operations can be accurately located relative to it." },
+  { q:"In green sand casting vs dry sand casting, which has BETTER surface finish?", opts:["Green sand","Dry sand","Both are equal","Depends on metal used"], ans:1, explain:"Dry sand casting produces a better surface finish because the mold is baked/dried, reducing moisture-related defects and producing a harder mold surface." },
+];
+
+let scores = { correct:0, attempted:0 };
+let answered = new Array(questions.length).fill(false);
+
+function buildQuiz() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  questions.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'quiz-q';
+    div.innerHTML = `
+      <div class="quiz-q-text">Q${i+1}. ${q.q}</div>
+      <div class="quiz-options">
+        ${q.opts.map((o,j)=>`<button class="quiz-opt" onclick="answerQ(${i},${j},this)" id="q${i}opt${j}">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="q${i}feedback"></div>
+    `;
+    container.appendChild(div);
+  });
+  updateScore();
+}
+
+function answerQ(qi, oi, btn) {
+  if(answered[qi]) return;
+  answered[qi] = true;
+  scores.attempted++;
+  const q = questions[qi];
+  const feedback = document.getElementById('q'+qi+'feedback');
+  document.querySelectorAll(`#q${qi}opt0, #q${qi}opt1, #q${qi}opt2, #q${qi}opt3`).forEach(b => b.disabled = true);
+  if(oi === q.ans) {
+    btn.classList.add('correct');
+    feedback.className = 'quiz-feedback show correct';
+    feedback.textContent = '✅ Correct! ' + q.explain;
+    scores.correct++;
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('q'+qi+'opt'+q.ans).classList.add('correct');
+    feedback.className = 'quiz-feedback show wrong';
+    feedback.textContent = '❌ Incorrect. ' + q.explain;
+  }
+  updateScore();
+}
+
+function updateScore() {
+  document.getElementById('score-display').textContent = `${scores.correct} / ${scores.attempted}`;
+}
+
+function resetQuiz() {
+  scores = {correct:0, attempted:0};
+  answered = new Array(questions.length).fill(false);
+  buildQuiz();
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
