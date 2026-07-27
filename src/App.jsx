@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 // ── STORAGE ───────────────────────────────────────────────────────────────────
 const store = {
@@ -130,6 +130,35 @@ function fmtTime(mins){
 function daysInMonth(y,mo){ return new Date(y,mo+1,0).getDate(); }
 function firstDay(y,mo){ return new Date(y,mo,1).getDay(); }
 
+// Parse a markdown timetable into sections of tickable actions.
+// Supports: # headings (sections), - [ ] / - [x] task items, plain "- " bullets,
+// numbered lists, and plain "07:00 Task" lines. A leading time is pulled out.
+function parseTimetable(md){
+  if(!md||!md.trim()) return [];
+  const clean = (s)=>s.replace(/[*_`~]/g,"").trim();
+  const timeRe = /^((?:\d{1,2}[:.]\d{2})(?:\s*[-–—]\s*\d{1,2}[:.]\d{2})?)\s*[-–—:.]?\s*(.*)$/;
+  const sections=[]; let cur=null;
+  const ensure=()=>{ if(!cur){ cur={title:"",items:[]}; sections.push(cur); } return cur; };
+  const addItem=(text,preChecked)=>{
+    let time=""; const tm=text.match(timeRe);
+    if(tm){ time=tm[1].replace(".",":"); if(tm[2].trim()) text=tm[2]; }
+    text=clean(text);
+    if(text||time) ensure().items.push({time,text,preChecked:!!preChecked});
+  };
+  md.split(/\r?\n/).forEach(raw=>{
+    const line=raw.trim();
+    if(!line) return;
+    const h=line.match(/^(#{1,6})\s+(.*)$/);
+    if(h){ cur={title:clean(h[2]),items:[]}; sections.push(cur); return; }
+    const li=line.match(/^(?:[-*+]|\d+[.)])\s+(?:\[([ xX])\]\s+)?(.*)$/);
+    if(li){ addItem(li[2], li[1]&&li[1].toLowerCase()==="x"); return; }
+    if(timeRe.test(line) && line.match(timeRe)[2].trim()){ addItem(line,false); return; }
+  });
+  let i=0;
+  sections.forEach(s=>s.items.forEach(it=>{ it.id=`tt${i++}`; }));
+  return sections.filter(s=>s.items.length>0);
+}
+
 // ── APP ───────────────────────────────────────────────────────────────────────
 export default function App() {
   const [loaded,      setLoaded]      = useState(false);
@@ -161,6 +190,13 @@ export default function App() {
   const [notebookEntries,setNotebookEntries]= useState([]);
   const [notebookText,   setNotebookText]   = useState("");
 
+  // timetable / plan
+  const [timetableMd,   setTimetableMd]   = useState("");
+  const [timetableName, setTimetableName] = useState("");
+  const [ttTicks,       setTtTicks]       = useState({});
+  const [ttPasteOpen,   setTtPasteOpen]   = useState(false);
+  const [ttPasteText,   setTtPasteText]   = useState("");
+
   // calendar
   const [calMonth,    setCalMonth]    = useState(new Date().getMonth());
   const [calYear,     setCalYear]     = useState(new Date().getFullYear());
@@ -182,6 +218,9 @@ export default function App() {
       if(d.habitLog)        setHabitLog(d.habitLog);
       if(d.journalEntries)  setJournalEntries(d.journalEntries);
       if(d.notebookEntries) setNotebookEntries(d.notebookEntries);
+      if(d.timetableMd)     setTimetableMd(d.timetableMd);
+      if(d.timetableName)   setTimetableName(d.timetableName);
+      if(d.ttTicks)         setTtTicks(d.ttTicks);
     }
     setLoaded(true);
   },[]);
@@ -191,9 +230,9 @@ export default function App() {
     if(!loaded) return;
     clearTimeout(saveTimer.current);
     saveTimer.current=setTimeout(()=>{
-      store.set("elisha_v3",{quitTs,cigsPerDay,packPrice,goalK,cravings,habitLog,journalEntries,notebookEntries});
+      store.set("elisha_v3",{quitTs,cigsPerDay,packPrice,goalK,cravings,habitLog,journalEntries,notebookEntries,timetableMd,timetableName,ttTicks});
     },600);
-  },[quitTs,cigsPerDay,packPrice,goalK,cravings,habitLog,journalEntries,notebookEntries,loaded]);
+  },[quitTs,cigsPerDay,packPrice,goalK,cravings,habitLog,journalEntries,notebookEntries,timetableMd,timetableName,ttTicks,loaded]);
 
   // ── TIMER ──
   useEffect(()=>{
@@ -249,6 +288,23 @@ export default function App() {
   const addJournal=()=>{ if(!journalText.trim()) return; setJournalEntries(prev=>[{text:journalText,date:new Date().toLocaleString(),dayKey:today},...prev].slice(0,100)); setJournalText(""); };
   const addNotebook=()=>{ if(!notebookText.trim()) return; setNotebookEntries(prev=>[{text:notebookText,date:new Date().toLocaleString(),dayKey:today},...prev].slice(0,100)); setNotebookText(""); };
 
+  // ── TIMETABLE ──
+  const ttSections = useMemo(()=>parseTimetable(timetableMd),[timetableMd]);
+  const ttItems    = ttSections.flatMap(s=>s.items);
+  const ttTotal    = ttItems.length;
+  const ttDone     = ttItems.filter(it=>ttTicks[it.id]).length;
+  const ttPct      = ttTotal?Math.round((ttDone/ttTotal)*100):0;
+  const loadTimetable=(text,name)=>{
+    const parsed=parseTimetable(text);
+    // seed ticks from any pre-checked [x] items in the document
+    const seed={}; parsed.forEach(s=>s.items.forEach(it=>{ if(it.preChecked) seed[it.id]=true; }));
+    setTimetableMd(text); setTimetableName(name||"timetable.md"); setTtTicks(seed);
+  };
+  const onTtFile=(e)=>{ const f=e.target.files&&e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>loadTimetable(String(r.result||""),f.name); r.readAsText(f); e.target.value=""; };
+  const toggleTt=(id)=>setTtTicks(p=>({...p,[id]:!p[id]}));
+  const clearTt=()=>setTtTicks({});
+  const removeTt=()=>{ setTimetableMd(""); setTimetableName(""); setTtTicks({}); setTtPasteOpen(false); setTtPasteText(""); };
+
   // ── CALENDAR ──
   const getDayScore=(key)=>{ const h=habitLog[key]||{}; const done=Object.values(h).filter(Boolean).length; return totalHabits>0?Math.round((done/totalHabits)*100):0; };
   const getDayBg=(score)=>{ if(score===0) return "rgba(255,255,255,0.03)"; if(score<40) return `rgba(192,57,43,0.35)`; if(score<70) return `rgba(201,162,39,0.4)`; return `rgba(143,196,58,0.45)`; };
@@ -257,6 +313,7 @@ export default function App() {
     {id:"command",  icon:"⚡", label:"OPS"},
     {id:"smoke",    icon:"🚭", label:"SMOKE"},
     {id:"mission",  icon:"📋", label:"MISSION"},
+    {id:"plan",     icon:"🗓️", label:"PLAN"},
     {id:"calendar", icon:"📅", label:"LOG"},
     {id:"intel",    icon:"📓", label:"INTEL"},
   ];
@@ -736,6 +793,101 @@ export default function App() {
           </div>
         )}
 
+        {/* ═══ PLAN / TIMETABLE ═══ */}
+        {tab==="plan"&&(
+          <div>
+            {!timetableMd?(
+              <div>
+                <div style={{...BOX({background:"rgba(143,196,58,0.06)",borderColor:"rgba(143,196,58,0.18)",textAlign:"center",marginTop:12})}}>
+                  <div style={{fontSize:28,marginBottom:8}}>🗓️</div>
+                  <div style={{fontSize:13,letterSpacing:2,color:C.text,fontWeight:700,marginBottom:4}}>UPLOAD TIMETABLE</div>
+                  <div style={{fontSize:10,color:C.muted,marginBottom:14,lineHeight:1.7}}>Load a Markdown (.md) plan, then tick actions off as you complete them.</div>
+                  <label style={{...BTN(`linear-gradient(135deg,${C.mid2},${C.mid3})`,C.accent,{display:"block",padding:12,cursor:"pointer"})}}>
+                    📄 CHOOSE .MD FILE
+                    <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" onChange={onTtFile} style={{display:"none"}}/>
+                  </label>
+                  <button onClick={()=>setTtPasteOpen(o=>!o)} style={{...BTN("rgba(255,255,255,0.05)",C.text,{width:"100%",marginTop:8})}}>
+                    {ttPasteOpen?"CLOSE PASTE":"OR PASTE TEXT"}
+                  </button>
+                  {ttPasteOpen&&(
+                    <div style={{marginTop:10}}>
+                      <textarea value={ttPasteText} onChange={e=>setTtPasteText(e.target.value)}
+                        placeholder="Paste your markdown timetable here..."
+                        style={{width:"100%",minHeight:120,padding:"9px 11px",borderRadius:6,background:"rgba(255,255,255,0.03)",border:`1px solid ${C.border}`,color:C.text,fontSize:11,fontFamily:"inherit",resize:"vertical",boxSizing:"border-box",lineHeight:1.7,textAlign:"left"}}/>
+                      <button onClick={()=>{if(ttPasteText.trim()){loadTimetable(ttPasteText,"pasted plan");setTtPasteText("");setTtPasteOpen(false);}}}
+                        style={{...BTN(`linear-gradient(135deg,${C.mid2},${C.mid3})`,C.accent,{width:"100%",marginTop:6})}}>LOAD PLAN →</button>
+                    </div>
+                  )}
+                </div>
+                <div style={{...BOX({background:"rgba(201,162,39,0.05)",borderColor:"rgba(201,162,39,0.15)"})}}>
+                  <div style={{fontSize:9,letterSpacing:3,fontWeight:700,color:C.gold,marginBottom:6}}>SUPPORTED FORMAT</div>
+                  <pre style={{margin:0,fontSize:10,color:C.dim,lineHeight:1.7,whiteSpace:"pre-wrap",fontFamily:"inherit"}}>{`# Morning
+- [ ] 06:00 Wake & pray
+- [ ] 06:30 PT / run
+- [ ] 07:30 Breakfast
+
+# Work Block
+- [ ] 09:00 Deep work
+- [ ] 12:00 Lunch`}</pre>
+                  <div style={{fontSize:9,color:C.muted,marginTop:8,lineHeight:1.7}}>Headings (#) become sections · each “- [ ]” line becomes a tickable action · a leading time like 07:00 shows as a badge.</div>
+                </div>
+              </div>
+            ):(
+              <div>
+                <div style={{...BOX({background:"rgba(143,196,58,0.06)",borderColor:"rgba(143,196,58,0.2)",marginTop:12})}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                    <div style={{minWidth:0}}>
+                      <div style={{fontSize:9,letterSpacing:3,fontWeight:700,color:C.muted,marginBottom:3}}>ACTIVE PLAN</div>
+                      <div style={{fontSize:12,color:C.text,fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{timetableName}</div>
+                    </div>
+                    <div style={{fontSize:26,fontWeight:900,color:ttPct>=80?C.accent:ttPct>=40?C.gold:C.alert,flexShrink:0,marginLeft:10}}>{ttPct}%</div>
+                  </div>
+                  <div style={{height:5,background:"rgba(255,255,255,0.05)",borderRadius:2,overflow:"hidden"}}>
+                    <div style={{height:"100%",width:`${ttPct}%`,background:`linear-gradient(90deg,${C.mid2},${C.accent})`,transition:"width .5s ease"}}/>
+                  </div>
+                  <div style={{fontSize:9,color:C.muted,marginTop:6,letterSpacing:1}}>{ttDone}/{ttTotal} ACTIONS COMPLETE</div>
+                </div>
+
+                {ttSections.map((s,si)=>{
+                  const secDone=s.items.filter(it=>ttTicks[it.id]).length;
+                  return(
+                    <div key={si} style={{marginBottom:12}}>
+                      {s.title&&(
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",margin:"4px 2px 6px"}}>
+                          <div style={{fontSize:10,letterSpacing:3,fontWeight:700,color:C.gold}}>{s.title.toUpperCase()}</div>
+                          <div style={{fontSize:9,color:C.muted}}>{secDone}/{s.items.length}</div>
+                        </div>
+                      )}
+                      {s.items.map(it=>{
+                        const done=!!ttTicks[it.id];
+                        return(
+                          <div key={it.id} onClick={()=>toggleTt(it.id)}
+                            style={{...BOX({display:"flex",alignItems:"center",gap:11,cursor:"pointer",marginBottom:6,background:done?"rgba(143,196,58,0.09)":C.sub,borderColor:done?"rgba(143,196,58,0.3)":C.border})}}>
+                            <div style={{width:22,height:22,borderRadius:4,flexShrink:0,background:done?C.accent:"rgba(255,255,255,0.04)",border:`1px solid ${done?C.accent:C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:done?C.dark1:"transparent",fontWeight:"bold"}}>✓</div>
+                            <div style={{flex:1,minWidth:0}}>
+                              <div style={{fontSize:11,color:done?C.dim:C.text,letterSpacing:.5,textDecoration:done?"line-through":"none",lineHeight:1.5}}>{it.text||"(no label)"}</div>
+                            </div>
+                            {it.time&&<div style={{fontSize:9,fontWeight:700,color:done?C.muted:C.accent,letterSpacing:1,flexShrink:0}}>{it.time}</div>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+
+                <div style={{display:"flex",gap:7,marginTop:4,marginBottom:8}}>
+                  <button onClick={clearTt} style={{...BTN("rgba(255,255,255,0.05)",C.text,{flex:1})}}>CLEAR TICKS</button>
+                  <label style={{...BTN("rgba(255,255,255,0.05)",C.text,{flex:1,cursor:"pointer",textAlign:"center"})}}>
+                    REPLACE
+                    <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" onChange={onTtFile} style={{display:"none"}}/>
+                  </label>
+                  <button onClick={removeTt} style={{...BTN("transparent",C.alert,{flex:1,borderColor:`${C.alert}40`})}}>REMOVE</button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ═══ INTEL / JOURNAL ═══ */}
         {tab==="intel"&&(
           <div>
@@ -779,7 +931,7 @@ export default function App() {
       </div>
 
       {/* BOTTOM NAV */}
-      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:`rgba(28,31,36,0.97)`,backdropFilter:"blur(14px)",borderTop:`1px solid ${C.border}`,display:"grid",gridTemplateColumns:"repeat(5,1fr)",padding:"7px 0 14px",zIndex:100}}>
+      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:480,background:`rgba(28,31,36,0.97)`,backdropFilter:"blur(14px)",borderTop:`1px solid ${C.border}`,display:"grid",gridTemplateColumns:"repeat(6,1fr)",padding:"7px 0 14px",zIndex:100}}>
         <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg,${C.dark3},${C.mid2},${C.tan1},${C.light1},${C.mid1},${C.dark2})`}}/>
         {TABS.map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2,padding:"3px 0"}}>
