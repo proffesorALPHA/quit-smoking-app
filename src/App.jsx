@@ -319,8 +319,9 @@ export default function App() {
   ];
 
   if(!loaded) return (
-    <div style={{minHeight:"100vh",background:C.dark1,display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div style={{fontSize:11,letterSpacing:5,fontWeight:700,color:C.accent,fontFamily:"ui-monospace,'Cascadia Code','Segoe UI Mono',Consolas,'Roboto Mono',monospace"}}>LOADING...</div>
+    <div style={{minHeight:"100vh",background:"#23262b",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,fontFamily:"ui-monospace,'Cascadia Code','Segoe UI Mono',Consolas,'Roboto Mono',monospace"}}>
+      <div style={{fontSize:24,fontWeight:900,letterSpacing:6,color:C.accent}}>AIRBOURNE</div>
+      <div style={{fontSize:9,letterSpacing:5,fontWeight:700,color:C.muted}}>LOADING...</div>
     </div>
   );
 
@@ -345,6 +346,14 @@ export default function App() {
       {/* HEADER */}
       <div style={{position:"relative",zIndex:1,background:C.glass,backdropFilter:"blur(12px)",borderBottom:`1px solid ${C.border}`}}>
         <div style={{height:3,background:`linear-gradient(90deg,${C.dark3},${C.mid2},${C.tan1},${C.light1},${C.mid1},${C.dark2})`}}/>
+        {/* COVER — heptapod logogram + wordmark */}
+        <div style={{display:"flex",alignItems:"center",gap:12,padding:"11px 16px 9px",borderBottom:`1px solid ${C.border}`}}>
+          <img src="/heptapod.svg" alt="AIRBOURNE" width={46} height={46} style={{flexShrink:0,borderRadius:"50%"}}/>
+          <div>
+            <div style={{fontSize:20,fontWeight:900,letterSpacing:5,color:C.accent,lineHeight:1}}>AIRBOURNE</div>
+            <div style={{fontSize:8,letterSpacing:4,fontWeight:700,color:C.muted,marginTop:4}}>DISCIPLINE · HEALTH · IDENTITY</div>
+          </div>
+        </div>
         <div style={{padding:"12px 16px 10px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div>
             <div style={{fontSize:9,letterSpacing:5,fontWeight:700,color:C.muted,marginBottom:3}}>FIELD COMMAND · ZAMBIA</div>
